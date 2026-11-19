@@ -112,6 +112,27 @@ class SessionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(call.active_turn)
         await ws.close()
 
+    async def test_cloud_requests_use_proxy_without_local_dns(self):
+        # The fake cloud also serves as an HTTP proxy. These hosts cannot resolve;
+        # both streaming HTTP and WebSocket traffic must reach it via the proxy.
+        proxy = str(self.cloud.make_url('/')).rstrip('/')
+        with patch.dict(os.environ, {
+            'HTTP_PROXY': proxy, 'http_proxy': proxy, 'NO_PROXY': '', 'no_proxy': '',
+            'WS_PROXY': '', 'ws_proxy': '',
+            'DEEPSEEK_CHAT_URL': 'http://cloud.invalid/chat',
+            'BOSON_API_BASE': 'http://cloud.invalid',
+            'BOSON_REALTIME_URL': 'ws://cloud.invalid/realtime',
+        }):
+            ws, ident = await self.connect('live-audio')
+            await self.stt[-1].send_json({'type': 'input_audio_buffer.speech_started'})
+            await self.stt[-1].send_json({
+                'type': 'conversation.item.input_audio_transcription.completed', 'transcript': '你好'})
+            events = await self.reply(ws)
+            self.assertEqual(events[-1]['type'], 'complete')
+            self.assertTrue(any(event['type'] == 'audio' for event in events))
+            self.assertEqual(len(self.stt), 1)
+            await ws.close()
+
     async def test_ownership_and_one_session_per_browser(self):
         ws, ident = await self.connect()
         response = await self.client.post('/api/session', json={'expertId': 'architecture', 'mode': 'agent'})

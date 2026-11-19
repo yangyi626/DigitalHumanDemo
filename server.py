@@ -16,6 +16,7 @@ from contextlib import aclosing, suppress
 from pathlib import Path
 from secrets import token_urlsafe
 from urllib.parse import urlsplit
+from urllib.request import getproxies, proxy_bypass
 from uuid import uuid4
 
 from aiohttp import ClientError, ClientSession, ClientTimeout, FormData, WSMsgType, web
@@ -348,8 +349,14 @@ class Conversation:
 
     async def configure_stt(self):
         url = os.getenv('BOSON_REALTIME_URL', 'wss://api.boson.ai/v1/realtime')
+        target = urlsplit(url)
+        proxies = getproxies()
+        # Windows system proxies expose HTTP/HTTPS, including for WebSockets.
+        proxy = None
+        if target.hostname and not proxy_bypass(target.hostname):
+            proxy = proxies.get(target.scheme) or proxies.get('https' if target.scheme == 'wss' else 'http')
         self.stt = await self.app['http'].ws_connect(url, headers={
-            'Authorization': 'Bearer ' + os.environ['BOSON_API_KEY']}, heartbeat=20)
+            'Authorization': 'Bearer ' + os.environ['BOSON_API_KEY']}, heartbeat=20, proxy=proxy)
         await self.stt.send_json({'type': 'session.update', 'session': {
             'model': 'higgs-realtime', 'output_modalities': ['text'], 'audio': {'input': {
                 'turn_detection': {'type': 'server_vad', 'create_response': False, 'silence_duration_ms': 800},
@@ -620,7 +627,7 @@ async def resources(app):
             for call in list(app['sessions'].values()):
                 if call.ws is None and now - call.created > 30:
                     app['sessions'].pop(call.id, None)
-    async with ClientSession(timeout=ClientTimeout(total=None, connect=12)) as http:
+    async with ClientSession(timeout=ClientTimeout(total=None, connect=12), trust_env=True) as http:
         app['http'] = http
         app['tts_voice'] = None
         if all(os.getenv(key, '').strip() for key in ('BOSON_API_KEY', 'DEEPSEEK_API_KEY')):
