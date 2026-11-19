@@ -1,0 +1,21 @@
+[Unit]
+Description=DH_live Architecture Expert Demo
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=dhlive-expert
+Group=dhlive-expert
+WorkingDirectory=/opt/DigitalHumanDemo
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/DigitalHumanDemo/.venv/bin/python /opt/DigitalHumanDemo/server.py
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

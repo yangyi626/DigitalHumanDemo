@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SF Field CTO · 专家咨询</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/style.css">
+<script defer src="assets/diagnostics.js?v=20261115-audit1"></script>
+<script defer src="assets/audio_recorder.js?v=20261115-video2"></script>
+<script defer src="assets/speech_player.js?v=20261115"></script>
+<script defer src="assets/demo.js?v=20261115-video2"></script>
+</head>
+<body>
+<header class="top"><div class="top-inner"><span class="brand"><span class="mark">SF</span> Field CTO</span></div></header>
+<main>
+  <div class="page-title"><div><p class="eyebrow">问专家</p><h1>专家咨询</h1></div></div>
+  <p id="startup-status" class="hint" role="status">正在检查服务配置。</p>
+  <div class="workspace" id="workspace" hidden>
+    <aside class="sidebar">
+      <section class="expert card" aria-label="当前专家">
+        <img id="expert-portrait" src="assets/expert-stage.jpg" alt="">
+        <div><h2 id="expert-name">架构专家</h2><p id="expert-specialty">擅长软件架构和技术方案的专家</p></div>
+      </section>
+      <section class="navigation card" aria-labelledby="mode-heading">
+        <h2 id="mode-heading">互动方式</h2>
+        <div class="modes" role="tablist" aria-label="互动方式">
+          <button role="tab" id="tab-text" aria-controls="panel" aria-selected="true" data-mode="text"><span class="icon tile keyboard" aria-hidden="true"></span><span><strong>文字问答</strong><small>打字提问，专家播报</small></span></button>
+          <button role="tab" id="tab-voice" aria-controls="panel" aria-selected="false" tabindex="-1" data-mode="voice"><span class="icon tile mic" aria-hidden="true"></span><span><strong>语音问答</strong><small>说完自动提交，逐轮回答</small></span></button>
+          <button role="tab" id="tab-video" aria-controls="panel" aria-selected="false" tabindex="-1" data-mode="video"><span class="icon tile camera" aria-hidden="true"></span><span><strong>实时视频</strong><small>看专家画面，随时插话</small></span></button>
+          <button role="tab" id="tab-audio" aria-controls="panel" aria-selected="false" tabindex="-1" data-mode="audio"><span class="icon tile phone" aria-hidden="true"></span><span><strong>实时通话</strong><small>纯语音通话，随时插话</small></span></button>
+        </div>
+      </section>
+    </aside>
+    <section id="panel" role="tabpanel" aria-labelledby="tab-text" class="conversation card">
+      <div class="panel-header"><div><h2 id="title">文字问答</h2><p id="description">输入问题，专家将播报答案</p></div><span id="badge" class="status"><i></i> 待提问</span></div>
+      <div class="panel-body">
+        <div id="stage" class="stage" hidden>
+          <img id="poster" src="assets/expert-stage.jpg" alt="" hidden>
+          <iframe id="avatar" title="数字专家实时画面" allow="autoplay" hidden></iframe>
+          <div class="stage-caption"><span><i></i> <span id="stage-state">专家就绪</span></span><strong id="stage-expert"></strong></div>
+        </div>
+        <div id="audio-stage" class="audio-stage">
+          <div class="audio-orbit"><div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></div>
+          <strong id="audio-expert"></strong><p id="audio-state">等待接通</p>
+        </div>
+        <div id="turn" class="turn" aria-live="polite" hidden>
+          <p class="question"><strong>我</strong><span id="question"></span></p>
+          <p class="answer" id="answer-row" hidden><strong>专家</strong><span id="answer"></span></p>
+        </div>
+        <section id="topics" class="topics" aria-labelledby="topics-heading">
+          <h3 id="topics-heading">推荐话题</h3>
+          <div class="topic-list">
+            <button data-topic="AI 投入，先发还是后发更划算？">AI 投入，先发还是后发更划算？<span aria-hidden="true">↗</span></button>
+            <button data-topic="如何判断 AI 项目是否值得投入？">如何判断 AI 项目是否值得投入？<span aria-hidden="true">↗</span></button>
+          </div>
+        </section>
+      </div>
+      <div class="dock">
+        <form id="composer" class="composer"><label for="question-input" class="sr-only">输入问题</label><input id="question-input" maxlength="1000" placeholder="输入你想问专家的问题" required><button class="primary" type="submit">发送 <span aria-hidden="true">↑</span></button></form>
+        <div id="controls" class="controls" hidden>
+          <button id="action" class="primary" type="button" hidden>开始语音问答</button>
+          <button id="hangup" class="hangup" type="button" hidden>结束会话</button>
+          <button id="sound" class="secondary" type="button" hidden>启用声音</button>
+        </div>
+        <p id="hint" class="hint" aria-live="polite">可以输入问题，或点选推荐话题</p>
+        <p id="mic-status" class="hint" data-error role="status" hidden>未检测到有效声音。请说一句话，并检查麦克风是否静音或被禁用。<span id="mic-wechat" hidden>在微信中，可点右上角菜单，选择在系统浏览器打开。</span></p>
+      </div>
+    </section>
+  </div>
+
+  <audio id="voice" preload="auto" playsinline webkit-playsinline></audio>
+</main>
+</body>
+</html>
