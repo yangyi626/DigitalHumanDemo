@@ -2,7 +2,7 @@
 
 支持文字问答、语音问答、实时视频和实时通话。DeepSeek 生成回答，Boson/Higgs 提供语音识别与合成，DH_live 在浏览器中渲染数字人。
 
-仓库已包含人物视频、配套参数和 WASM 运行文件，无需启动 DH_live 原仓库、安装 PyTorch 或配置 GPU。也不需要 Docker。
+仓库已包含人物视频、配套参数、WASM 运行文件和专家参考录音，无需启动 DH_live 原仓库、安装 PyTorch 或配置 GPU。也不需要 Docker。
 
 ## 快速开始
 
@@ -28,7 +28,9 @@ python run.py
 
 Linux / macOS 可使用 `python3.11 run.py`，Windows 可使用 `py -3.11 run.py`。脚本会自动建立 `.venv`、安装锁定的运行依赖并启动服务。如果没有 `.env`，首次运行会自动创建样例并提示填写 Key。
 
-打开 **http://localhost:8789/**。无需发布网页快照，也无需安装 Node.js。`BOSON_VOICE=default` 使用语音服务默认音色；专属专家音色需要在自己的 Boson 账户中配置可用的 Voice ID。
+打开 **http://localhost:8789/**。无需发布网页快照，也无需安装 Node.js。默认 `BOSON_VOICE=expert` 使用专家音色：原 Boson 账号直接复用线上已有音色，其他账号启动时自动上传仓库内的专家参考录音并注册音色。所有四种模式均使用该音色播报。
+
+已有 `.env` 若仍设置 `BOSON_VOICE=default`，请改成 `BOSON_VOICE=expert`。也可以填入自己已有的 Voice ID；详细说明和参考录音见 [专家音色](voice/expert/README.md)。
 
 Key 需要对应服务的模型权限和可用额度。默认模型为 `deepseek-flash`、`higgs-tts-3`、`higgs-realtime` / `higgs-stt-3.1`。数字人画面在用户设备上运行；语音和问答会调用云服务。
 
@@ -49,7 +51,7 @@ Key 需要对应服务的模型权限和可用额度。默认模型为 `deepseek
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |
-| `BOSON_VOICE` | `default` | 语音合成音色 |
+| `BOSON_VOICE` | `expert` | 自动准备专家音色；也可填写自己的 Voice ID 或 `default` |
 | `HOST` | `127.0.0.1` | 服务监听地址 |
 | `PORT` | `8789` | 服务端口 |
 | `DEEPSEEK_MODEL` | `deepseek-flash` | 问答模型 |
@@ -77,6 +79,8 @@ run.py                 自动安装依赖、检查配置与启动
 server.py              HTTP、WebSocket、云端问答和语音调用
 barge_in.py            实时模式插话确认
 voice_turn.py          可选语音识别分支的整句音频收集
+expert_voice.py        使用或自动注册专家音色
+voice/expert/          专家参考录音及逐字稿
 web/                   页面、录音、字幕和语音播放器
 avatar/                DH_live 渲染代码、WASM、人物视频和参数
 deploy/                Linux 服务、Nginx 和网页版本发布

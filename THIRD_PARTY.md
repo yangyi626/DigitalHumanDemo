@@ -4,7 +4,8 @@
 - `avatar/js/pako.min.js` 为 pako 解压库，原文件中的 MIT / Zlib 许可标记保持不变。WASM 内嵌依赖的许可标记保持不变。
 - `avatar/assets/`、`avatar/assets2/`、`avatar/background/` 和 `avatar/common/` 是随原 DH_live 网页资源取得的配套素材。未移除素材水印。
 - `avatar/assets-higgs/` 为专家参考形象生成的待机视频和 DH_live 预处理参数，沿用本项目已有部署素材。人物准备由 Higgs Avatar 与 DH_live 工具完成；运行时无需这些准备服务。用户此前授权该人物用于本项目。该记录不是对人物肖像、商标或第三方素材的额外授权，具体使用范围沿用素材来源条件。
-- `web/` 页面基于原专家咨询 Demo 改写。默认人物与默认语音服务音色分别配置，使用者可设置自己账户中可用的 `BOSON_VOICE`。
+- `voice/expert/reference.wav` 和 `reference.txt` 沿用项目已有的专家首页问候参考录音及逐字稿，原文为“你好，云娟。今天想聊点什么呢？”。原线上云端音色名称为“SF Field CTO 首页问候”。默认配置在用户账户中复用或注册该专家音色。
+- `web/` 页面基于原专家咨询 Demo 改写。人物与语音音色分别配置，使用者也可设置自己账户中可用的 `BOSON_VOICE`。
 - DeepSeek 和 Boson/Higgs 通过用户自己的服务端 Key 调用；其服务和模型遵循各自条款。
 
 本仓库不包含真实 API Key、原部署站点配置备份或一次性人物制作环境。无需另行克隆或启动 DH_live 原仓库。

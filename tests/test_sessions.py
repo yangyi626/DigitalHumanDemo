@@ -61,6 +61,7 @@ class SessionsTest(unittest.IsolatedAsyncioTestCase):
         self.cloud = TestServer(fake)
         await self.cloud.start_server()
         self.env = patch.dict(os.environ, {'DEEPSEEK_API_KEY': 'test-deepseek', 'BOSON_API_KEY': 'test-boson',
+            'BOSON_VOICE': 'default',
             'SESSION_SIGNING_KEY': 'test-session-signing-key',
             'DEEPSEEK_CHAT_URL': str(self.cloud.make_url('/chat')),
             'BOSON_API_BASE': str(self.cloud.make_url('/')), 'BOSON_REALTIME_URL': str(self.cloud.make_url('/realtime')).replace('http:', 'ws:')})

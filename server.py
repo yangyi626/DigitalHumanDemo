@@ -22,6 +22,7 @@ from aiohttp import ClientError, ClientSession, ClientTimeout, FormData, WSMsgTy
 from dotenv import load_dotenv
 
 from barge_in import BargeInConfirmation
+from expert_voice import resolve_voice
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / '.env')
@@ -93,11 +94,11 @@ async def stream_answer(http, question, history):
         raise DemoError('DeepSeek 连接失败或返回异常，请重试。') from error
 
 
-async def synthesize(http, text):
+async def synthesize(http, text, voice):
     url = os.getenv('BOSON_API_BASE', 'https://api.boson.ai/v1').rstrip('/') + '/audio/speech'
     pcm = bytearray()
     async with http.post(url, headers={'Authorization': 'Bearer ' + os.environ['BOSON_API_KEY']}, json={
-        'model': 'higgs-tts-3', 'input': text, 'voice': os.getenv('BOSON_VOICE') or 'default',
+        'model': 'higgs-tts-3', 'input': text, 'voice': voice,
         'response_format': 'pcm', 'stream': True, 'normalize': False,
     }, timeout=ClientTimeout(total=45, connect=12, sock_read=20), allow_redirects=False) as response:
         if response.status != 200:
@@ -229,7 +230,7 @@ class Conversation:
             nonlocal sequence
             while (segment := await segments.get()) is not None:
                 text, caption = segment
-                audio, seconds = await synthesize(self.app['http'], text)
+                audio, seconds = await synthesize(self.app['http'], text, self.app['tts_voice'])
                 if self.active_turn != turn:
                     return
                 await self.send('audio', turnId=turn, sequence=sequence, answer=caption,
@@ -621,6 +622,11 @@ async def resources(app):
                     app['sessions'].pop(call.id, None)
     async with ClientSession(timeout=ClientTimeout(total=None, connect=12)) as http:
         app['http'] = http
+        app['tts_voice'] = None
+        if all(os.getenv(key, '').strip() for key in ('BOSON_API_KEY', 'DEEPSEEK_API_KEY')):
+            app['tts_voice'] = await resolve_voice(http, os.getenv('BOSON_API_BASE', 'https://api.boson.ai/v1'),
+                                                   os.environ['BOSON_API_KEY'], os.getenv('BOSON_VOICE', 'expert'))
+            LOG.info('已配置播报音色：%s', app['tts_voice'])
         expiry = asyncio.create_task(expire())
         yield
         expiry.cancel()
